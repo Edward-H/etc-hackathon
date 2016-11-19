@@ -100,14 +100,12 @@ def private_parse(message):
             if order.id == message["order_id"]:
                 order.fill(message["size"])
     elif message["type"] == "reject":
-        if message["error"] = "LIMIT:POSITION":
-            raise "Aargh!"
         for order in unverified_orders:
             if order.id == message["order_id"]:
                 unverified_orders.remove(order)
                 if order.dir == True:
                     pending_bank_max[order.stock] -= order.size
-                else
+                else:
                     pending_bank_min[order.stock] += order.size
     elif message["type"] == "ack":
         for order in unverified_orders:
