@@ -5,6 +5,19 @@ import sys
 import socket
 import json 
 
+def add(id,stock,dir,price,size)
+    if(dir==true) b="BUY"
+    else b="SELL"
+    write(exchange,{"type": "add", "order_id": id, "symbol": stock, "dir": b, "price": price, "size": size})
+
+def convert(id,stock,dir,size)
+    if(dir==true) b="BUY"
+    else b="SELL"
+    {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size}
+
+def cancel(id)
+    {"type": "cancel", "order_id": id}
+
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(("test-exch-carrot", 25000))
@@ -19,7 +32,7 @@ def read(exchange):
 
 def main():
     exchange = connect()
-    write(exchange, {"type": "hello", "team": "TEAMNAME"})
+    write(exchange, {"type": "hello", "team": "CARROT"})
     hello_from_exchange = read(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
