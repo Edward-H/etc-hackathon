@@ -34,6 +34,11 @@ def parse(message):
     elif message["type"] == "book":
         books[message["symbol"]] = {
             "buy": message["buy"], "sell": message["sell"]}
+    elif message["type"] == "fill":
+        for order in pending_orders:
+            if order.id == message["order_id"]:
+                order.fill(message["size"])
+        
     backfill_data()
 
 

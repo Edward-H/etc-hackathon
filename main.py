@@ -6,7 +6,7 @@ import socket
 import json
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-
+pending_order_list = []
 
 class Order(object):
     id = 0
@@ -26,7 +26,7 @@ class Order(object):
         order = Order(id, stock, dir, price, size)
         return order
 
-    def add:
+    def add():
         b = ""
         if dir == true:
             b = "BUY"
@@ -35,14 +35,19 @@ class Order(object):
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
 
-    def ack:
-        if(dir == true) bank[stock] += size
-        else bank[stock] -= size
+    def fill(fill_size):
+        size -= fill_size
+        if(dir == true):
+            bank[stock] += fill_size
+        else:
+            bank[stock] -= fill_size
 
-    def cancel:
+    def cancel():
         write(exchange, {"type": "cancel", "order_id": id})
-        if(dir == true) bank[stock] -= size
-        else bank[stock] += size
+        if(dir == true):
+            bank[stock] -= size
+        else:
+            bank[stock] += size
 
 
 def connect():
@@ -59,21 +64,21 @@ def write(exchange, obj):
 def read(exchange):
     return json.loads(exchange.readline())
 
+def update_orders():
+    for order in pending_orders:
+        if order.size == 0:
+            pending_orders.remove(order)
 
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
-    global trade_id
-    current_bond_price = get_latest_price()["BOND"]
-    if current_bond_price > 1000 and bank["BOND"] > 0:
-        # Sell bonds (if we have any) if they are more than 1000.
+    # Update the book if no orders are pending
+    if not [x for x in pending_orders if x.stock == "BOND"]:
+        global trade_id
         trade_id += 1
-        add(trade_id, "BOND", False, current_bond_price +
-            1, min(bank["BOND"], entry.size))
-    elif current_bond_price < 1000 and bank["BOND"] < 100:
-        # Buy more bonds (if we can) if they are less than 1000.
-        trade_id += 1
-        add(trade_id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
-
+        if bank["BOND"] == 0:
+            pending_orders.append(Order.make_order(trade_id, "BOND", True, 1000, 100))
+        else:
+            pending_orders.append(Order.make_order(trade_id, "BOND", False, 1001, bank["BOND"]))
 
 def main():
     global exchange
@@ -82,6 +87,7 @@ def main():
     try:
         while True:
             parse(read(exchange))
+            update_orders()
             update_bond_holdings()
     except KeyboardInterrupt:
         exchange.close()
