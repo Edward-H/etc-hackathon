@@ -11,7 +11,9 @@ import pandas as pd
 
 symbols = ["BOND", "VALBZ", "VALE", "GS", "MS", "WFC", "XLF"]
 price = pd.DataFrame(columns=symbols) # Trading Price of transation
+price.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 volume = pd.DataFrame(columns=symbols) # Trading Volume of transaction
+volume.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 books = {}
 
 def parse(message):
@@ -30,6 +32,11 @@ def get_latest_price():
     latest_price = price.ix[price.shape[0]-1].to_dict()
     return latest_price
 
+def get_latest_volume():
+    backfill_data()
+    latest_vol = volume.loc[volume.shape[0]-1].to_dict()
+    return latest_vol
+
 if __name__ == "__main__":
     import random
     for i in range(100):
@@ -39,3 +46,4 @@ if __name__ == "__main__":
                    "size": random.randint(100000, 500000)}
         parse(message)
     print(get_latest_price())
+    print(get_latest_volume())
