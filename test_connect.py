@@ -27,6 +27,7 @@ if __name__ == "__main__":
     from parse_public_message import *
     exchange = connect()
     iteration = 0
+    write(exchange, {"type": "hello", "team": "Carrot"})
     while iteration < 100:
         message = read(exchange)
         parse(message)

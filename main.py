@@ -34,7 +34,7 @@ def cancel(id):
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("test-exch-carrot", 25000))
+    s.connect(("10.0.1.245", 25000))
     return s.makefile('rw', 1)
 
 
