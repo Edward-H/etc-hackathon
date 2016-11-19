@@ -7,9 +7,8 @@ import json
 
 from parse_public_message import *
 
-bank = {"money": 0, "BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-
-id = 0
+global bank = {"money": 0, "BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+global id = 0
 
 def add(id, stock, dir, price, size):
     if dir == True:
