@@ -38,7 +38,7 @@ class Order(object):
     size = 0
 
     def __init__(self, id, stock, dir, price, size):
-       self.id = id
+        self.id = id
         self.stock = stock
         self.dir = dir
         self.price = price
