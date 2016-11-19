@@ -125,7 +125,7 @@ def update_bond_holdings():
         order = Order(trade_id, "BOND", True, 1000, 100)
         order.add()
         pending_orders.append(order)
-    elif bank["BOND"] > 0:
+    elif pending_bank["BOND"] > 0 and bank["BOND"] > 0 :
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
         pending_orders.append(order)
