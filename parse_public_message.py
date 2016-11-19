@@ -82,6 +82,21 @@ def get_books_mbms(symbol):
             min_sell = min(min_sell, quote[0])
     return max_buy, min_sell
 
+def get_multi_books_mbms(symbol, limit=None):
+    max_buy = []
+    min_sell = []
+    for quote in books[symbol]["buy"]:
+        for i in range(len(quote[1])):
+            max_buy.append(quote[0])
+    for quote in books[symbol]["sell"]:
+        for i in range(len(quote[1])):
+            min_sell.append(quote[0])
+    max_buy.sort(reverse=True)
+    min_sell.sort(reverse=True)
+    max_buy = max_buy[0:limit]
+    min_sell = min_sell[0:limit]
+    return max_buy, min_sell
+
 def get_estimated_price(symbol, period=20):
     last_price = price[symbol].dropna().tail(20)
     coeffs = np.polyfit(last_price.index, last_price.values, 3)
