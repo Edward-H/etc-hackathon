@@ -4,7 +4,9 @@ from __future__ import print_function
 import sys
 import socket
 import json
-
+import pdb
+<<<<<<< HEAD
+>>>>>>> origin/master
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
@@ -46,7 +48,6 @@ class Order(object):
 
     def add(self):
         b = ""
-        pdb.set_trace()
         if self.dir == True:
             b = "BUY"
             pending_bank[self.stock] += self.size
@@ -109,31 +110,35 @@ def update_orders():
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
     # Update the book if no orders are pending
-    if not [x for x in pending_orders if x.stock == "BOND"]:
-        global trade_id
-        trade_id += 1
-        if pending_bank["BOND"] == 0:
-            order = Order(trade_id, "BOND", True, 1000, 100)
-            order.add
-            pending_orders.append(order)
-        else:
-            order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
-            order.add
-            pending_orders.append(order)
-==========
+    global trade_id
+    trade_id += 1
+    if pending_bank["BOND"] == 0:
+        order = Order(trade_id, "BOND", True, 1000, 100)
+        order.add()
+        pending_orders.append(order)
+    else:
+        order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+        order.add()
+        pending_orders.append(order)
+
+
 def trade_stock(stock):
     est = get_estimate_price(stock)
-    (buy,sell)=get_books_msmb(stock)
+    (buy, sell) = get_books_msmb(stock)
     global trade_id
-    trade_id+=1
-    if(est>(sell+buy)/2)
-        order = Order(trade_id, stock, True, (sell+buy)/2, 10)
-        if(bank[stock]+pending_bank[stock]<=90)
+    trade_id += 1
+    if(est > (sell + buy) / 2)
+        order = Order(trade_id, stock, True, (sell + buy) / 2, 10)
+        if(bank[stock] + pending_bank[stock] <= 90)
             order.add()
             unverified_orders.append(order)
     else if (est<(sell+buy)/2)
         order = Order(trade_id, stock, False, (sell+buy)/2, 10)
         if(bank[stock]+pending_bank[stock]>=-90)
+            pending_orders.append(order)
+    else if (est < (sell + buy) / 2)
+        order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
+        if(bank[stock] + pending_bank[stock] >= -90)
             order.add()
             unverified_orders.append(order)
 
@@ -150,6 +155,7 @@ def main():
             update_orders()
             update_bond_holdings()
             print(bank)
+            print(pending_bank)
             for order in pending_orders:
                 print(order)
             print("\n")
