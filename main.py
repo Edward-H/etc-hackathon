@@ -3,7 +3,9 @@ from __future__ import print_function
 
 import sys
 import socket
-import json 
+import json
+
+bank("money":0, "BOND":0, "VALBZ":0, "VALE":0, "GS":0, "MS":0, "WFC":0, "XLF":0)
 
 def add(id,stock,dir,price,size)
     if(dir==true) b="BUY"
@@ -17,6 +19,8 @@ def convert(id,stock,dir,size)
 
 def cancel(id)
     {"type": "cancel", "order_id": id}
+
+
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
