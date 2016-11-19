@@ -5,30 +5,44 @@ import sys
 import socket
 import json
 
-bank = {"money": 0, "BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 
 
-def add(id, stock, dir, price, size):
-    b = ""
-    if dir == true:
-        b = "BUY"
-    else:
-        b = "SELL"
-    write(exchange, {"type": "add", "order_id": id, "symbol":
-          stock, "dir": b, "price": price, "size": size})
 
+class Order(object):
+    id=0
+    stock=""
+    dir=true
+    price=0
+    size=0
+    
+    def __init__(self,id,stock,dir,price,size):
+        self.id=id
+        self.stock=stock
+        self.dir=dir
+        self.price=price
+        self.size=size
+        
+    def make_order(id,stock,dir,price,size):
+        order = Order(id,stock,dir,price,size)
+        return order
 
-def convert(id, stock, dir, size):
-    if dir == true:
-        b = "BUY"
-    else:
-        b = "SELL"
-    write(exchange,
-          {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
+    def add:
+        b = ""
+        if dir == true:
+            b = "BUY"
+        else:
+            b = "SELL"
+        write(exchange, {"type": "add", "order_id": id, "symbol":
+              stock, "dir": b, "price": price, "size": size})
 
-
-def cancel(id):
-    write(exchange, {"type": "cancel", "order_id": id})
+    def ack:
+        if(dir==true) bank[stock]+=size
+        else bank[stock]-=size
+    def cancel:
+        write(exchange, {"type": "cancel", "order_id": id})
+        if(dir==true) bank[stock]-=size
+        else bank[stock]+=size
 
 import pandas as pd
 
