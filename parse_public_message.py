@@ -32,14 +32,9 @@ def parse(message):
         price.loc[price.shape[0], message["symbol"]] = float(message["price"])
         volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
     elif message["type"] == "book":
-<<<<<<< HEAD
-        books[message["symbol"]] = {"buy": message["buy"], "sell": message["sell"]}
-    #backfill_data()
-=======
         books[message["symbol"]] = {
             "buy": message["buy"], "sell": message["sell"]}
     backfill_data()
->>>>>>> origin/master
 
 
 def get_latest_price():
