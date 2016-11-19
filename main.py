@@ -5,6 +5,7 @@ import sys
 import socket
 import json
 
+<<<<<<< HEAD
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 
 
@@ -44,41 +45,40 @@ class Order(object):
         write(exchange, {"type": "cancel", "order_id": id})
         if(dir==true) bank[stock]-=size
         else bank[stock]+=size
+=======
+from parse_public_message import *
 
-import pandas as pd
-
-# Symbols
-# BOND, VALBZ, VALE, GS, MS, WFC, XLF
-# XLF: 3 BOND 2 GS 3 MS 2 WFC
-
-symbols = ["BOND", "VALBZ", "VALE", "GS", "MS", "WFC", "XLF"]
-price = pd.DataFrame(columns=symbols)  # Trading Price of transation
-volume = pd.DataFrame(columns=symbols)  # Trading Volume of transaction
-books = {}
+bank = {"money": 0, "BOND": 0, "VALBZ": 0,
+        "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+trade_id = 0
 
 
-def parse(message):
-    if message["type"] == "trade":
-        price.loc[price.shape[0], message["symbol"]] = float(message["price"])
-        volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
+def add(id, stock, dir, price, size):
+    if dir == True:
+        b = "BUY"
+    else:
+        b = "SELL"
+    write(exchange, {"type": "add", "order_id": id, "symbol":
+          stock, "dir": b, "price": price, "size": size})
 
 
-def backfill_data():
-    price.fillna(method="ffill", inplace=True)
-    price.fillna(method="bfill", inplace=True)
-    volume.fillna(method="ffill", inplace=True)
-    volume.fillna(method="bfill", inplace=True)
+def convert(id, stock, dir, size):
+    if dir == True:
+        b = "BUY"
+    else:
+        b = "SELL"
+    write(exchange,
+          {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
 
 
-def get_latest_price():
-    backfill_data()
-    latest_price = price.ix[price.shape[0] - 1].to_dict()
-    return latest_price
+def cancel(id):
+    write(exchange, {"type": "cancel", "order_id": id})
+>>>>>>> origin/master
 
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("test-exch-carrot", 25000))
+    s.connect(("10.0.1.245", 25000))
     return s.makefile('rw', 1)
 
 
@@ -91,11 +91,32 @@ def read(exchange):
     return json.loads(exchange.readline())
 
 
+def update_bond_holdings():
+    # TO-DO: Cancel orders when impossible/better options exist.
+    global trade_id
+    current_bond_price = get_latest_price()["BOND"]
+    if current_bond_price > 1000 and bank["BOND"] > 0:
+        # Sell bonds (if we have any) if they are more than 1000.
+        trade_id += 1
+        add(trade_id, "BOND", False, current_bond_price +
+            1, min(bank["BOND"], entry.size))
+    elif current_bond_price < 1000 and bank["BOND"] < 100:
+        # Buy more bonds (if we can) if they are less than 1000.
+        trade_id += 1
+        add(trade_id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
+
+
 def main():
+    global exchange
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
-    hello_from_exchange = read(exchange)
-    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+    try:
+        while True:
+            parse(read(exchange))
+            update_bond_holdings()
+    except KeyboardInterrupt:
+        exchange.close()
+        print(bank)
 
 if __name__ == "__main__":
     main()
