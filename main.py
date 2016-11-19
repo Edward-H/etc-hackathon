@@ -158,6 +158,7 @@ def main():
             private_parse(exchange_msg)
             update_orders()
             update_bond_holdings()
+            print(exchange_msg)
             print(bank)
             print(pending_bank)
             for order in pending_orders:
