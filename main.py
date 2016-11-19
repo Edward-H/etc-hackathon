@@ -8,12 +8,15 @@ import json
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-pending_bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+pending_bank = {"BOND": 0, "VALBZ": 0, "VALE":
+                0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 trade_id = 0
 
+
 def get_historical_points(stock):
     last_20_price = price[stock].dropna().tail(20)
+
 
 def convert(id, stock, dir, size):
     if dir == True:
@@ -22,6 +25,7 @@ def convert(id, stock, dir, size):
         b = "SELL"
     write(exchange,
           {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
+
 
 class Order(object):
     id = 0
@@ -40,37 +44,38 @@ class Order(object):
     def __str__(self):
         return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
 
-    def add():
+    def add(self):
         b = ""
-        if dir == True:
+        pdb.set_trace()
+        if self.dir == True:
             b = "BUY"
-            pending_bank[stock] += size
+            pending_bank[self.stock] += self.size
         else:
             b = "SELL"
-            pending_bank[stock] -= size
-        write(exchange, {"type": "add", "order_id": id, "symbol":
-              stock, "dir": b, "price": price, "size": size})
+            pending_bank[self.stock] -= self.size
+        write(exchange, {"type": "add", "order_id": self.id, "symbol":
+              self.stock, "dir": b, "price": self.price, "size": self.size})
 
-    def cancel():
-        write(exchange, {"type": "cancel", "order_id": id})
-        if(dir==True):
-            bank[stock]-=size
+    def cancel(self):
+        write(exchange, {"type": "cancel", "order_id": self.id})
+        if(self.dir == True):
+            bank[self.stock] -= self.size
         else:
-            bank[stock]+=size
+            bank[self.stock] += self.size
 
-    def fill(fill_size):
-        size -= fill_size
-        if(dir == True):
-            bank[stock] += fill_size
+    def fill(self, fill_size):
+        self.size -= fill_size
+        if(self.dir == True):
+            bank[self.stock] += fill_size
         else:
-            bank[stock] -= fill_size
+            bank[self.stock] -= fill_size
 
-    def cancel():
-        write(exchange, {"type": "cancel", "order_id": id})
-        if(dir == True):
-            bank[stock] -= size
+    def cancel(self):
+        write(exchange, {"type": "cancel", "order_id": self.id})
+        if(self.dir == True):
+            bank[self.stock] -= self.size
         else:
-            bank[stock] += size
+            bank[self.stock] += self.size
 
 
 def connect():
@@ -87,16 +92,19 @@ def write(exchange, obj):
 def read(exchange):
     return json.loads(exchange.readline())
 
+
 def private_parse(message):
     if message["type"] == "fill":
         for order in pending_orders:
             if order.id == message["order_id"]:
                 order.fill(message["size"])
 
+
 def update_orders():
     for order in pending_orders:
         if order.size == 0:
             pending_orders.remove(order)
+
 
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
@@ -112,6 +120,7 @@ def update_bond_holdings():
             order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
             order.add
             pending_orders.append(order)
+
 
 def main():
     global exchange
