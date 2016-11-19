@@ -4,6 +4,7 @@ from __future__ import print_function
 import sys
 import socket
 import json
+import pdb
 
 from parse_public_message import *
 
@@ -46,7 +47,6 @@ class Order(object):
 
     def add(self):
         b = ""
-        pdb.set_trace()
         if self.dir == True:
             b = "BUY"
             pending_bank[self.stock] += self.size
@@ -109,17 +109,16 @@ def update_orders():
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
     # Update the book if no orders are pending
-    if not [x for x in pending_orders if x.stock == "BOND"]:
-        global trade_id
-        trade_id += 1
-        if pending_bank["BOND"] == 0:
-            order = Order(trade_id, "BOND", True, 1000, 100)
-            order.add
-            pending_orders.append(order)
-        else:
-            order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
-            order.add
-            pending_orders.append(order)
+    global trade_id
+    trade_id += 1
+    if pending_bank["BOND"] == 0:
+        order = Order(trade_id, "BOND", True, 1000, 100)
+        order.add()
+        pending_orders.append(order)
+    else:
+        order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+        order.add()
+        pending_orders.append(order)
 
 
 def main():
@@ -134,6 +133,7 @@ def main():
             update_orders()
             update_bond_holdings()
             print(bank)
+            print(pending_bank)
             for order in pending_orders:
                 print(order)
             print("\n")
