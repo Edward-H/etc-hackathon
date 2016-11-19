@@ -15,6 +15,8 @@ price.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 volume = pd.DataFrame(columns=symbols) # Trading Volume of transaction
 volume.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 books = {}
+for symbol in symbols:
+    books[symbol] = {"buy": [], "sell": []}
 
 def backfill_data():
     price.fillna(method="ffill", inplace=True)
@@ -26,6 +28,8 @@ def parse(message):
     if message["type"] == "trade":
         price.loc[price.shape[0], message["symbol"]] = float(message["price"])
         volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
+    elif message["type"] == "book":
+        books[message["symbol"]] = {"buy": message["buy"], "sell": message["sell"]}
     backfill_data()
 
 def get_latest_price():
@@ -51,6 +55,9 @@ def get_latest_volume():
     backfill_data()
     latest_vol = volume.loc[volume.shape[0]-1].to_dict()
     return latest_vol
+
+def get_latest_books():
+    return books
 
 if __name__ == "__main__":
     import random
