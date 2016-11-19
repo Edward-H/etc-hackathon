@@ -10,6 +10,7 @@ from parse_public_message import *
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
+unverified_orders = []
 trade_id = 0
 
 def get_historical_points(stock):
@@ -92,6 +93,16 @@ def private_parse(message):
         for order in pending_orders:
             if order.id == message["order_id"]:
                 order.fill(message["size"])
+    elif message["type"] == "reject":
+        for order in range(len(unverified_orders)):
+            if order.id == message["order_id"]:
+                unverified_orders.remove(order)
+    elif message["type"] == "ack":
+        for order in unverified_orders:
+            if order.id == message["order_id"]:
+                pending_orders.append(order)
+                unverified_orders.remove(order)
+                
 
 def update_orders():
     for order in pending_orders:
@@ -107,11 +118,11 @@ def update_bond_holdings():
         if pending_bank["BOND"] == 0:
             order = Order(trade_id, "BOND", True, 1000, 100)
             order.add
-            pending_orders.append(order)
+            unverified_orders.append(order)
         else:
             order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
             order.add
-            pending_orders.append(order)
+            unverified_orders.append(order)
 
 def main():
     global exchange
