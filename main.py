@@ -5,13 +5,16 @@ import sys
 import socket
 import json
 
+from public_parse_message import *
+
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-pending_order_list = []
+pending_orders = []
+trade_id = 0
 
 class Order(object):
     id = 0
     stock = ""
-    dir = true
+    dir = True
     price = 0
     size = 0
 
@@ -23,12 +26,13 @@ class Order(object):
         self.size = size
 
     def make_order(id, stock, dir, price, size):
+        @staticmethod
         order = Order(id, stock, dir, price, size)
         return order
 
     def add():
         b = ""
-        if dir == true:
+        if dir == True:
             b = "BUY"
         else:
             b = "SELL"
@@ -37,14 +41,14 @@ class Order(object):
 
     def fill(fill_size):
         size -= fill_size
-        if(dir == true):
+        if(dir == True):
             bank[stock] += fill_size
         else:
             bank[stock] -= fill_size
 
     def cancel():
         write(exchange, {"type": "cancel", "order_id": id})
-        if(dir == true):
+        if(dir == True):
             bank[stock] -= size
         else:
             bank[stock] += size
