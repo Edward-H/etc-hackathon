@@ -11,6 +11,17 @@ bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 trade_id = 0
 
+def get_historical_points(stock):
+    last_20_price = price[stock].dropna().tail(20)
+
+def convert(id, stock, dir, size):
+    if dir == True:
+        b = "BUY"
+    else:
+        b = "SELL"
+    write(exchange,
+          {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
+
 class Order(object):
     id = 0
     stock = ""
@@ -25,6 +36,9 @@ class Order(object):
         self.price = price
         self.size = size
 
+    def __str__(self):
+        return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
+
     def add():
         b = ""
         if dir == True:
@@ -33,6 +47,13 @@ class Order(object):
             b = "SELL"
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
+
+    def cancel():
+        write(exchange, {"type": "cancel", "order_id": id})
+        if(dir==True):
+            bank[stock]-=size
+        else:
+            bank[stock]+=size
 
     def fill(fill_size):
         size -= fill_size
@@ -51,7 +72,7 @@ class Order(object):
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("10.0.1.245", 25000))
+    s.connect(("test-exch-carrot", 25001))
     return s.makefile('rw', 1)
 
 
@@ -75,9 +96,13 @@ def update_bond_holdings():
         global trade_id
         trade_id += 1
         if bank["BOND"] == 0:
-            pending_orders.append(Order(trade_id, "BOND", True, 1000, 100))
+            order = Order(trade_id, "BOND", True, 1000, 100)
+            order.add()
+            pending_orders.append(order)
         else:
-            pending_orders.append(Order(trade_id, "BOND", False, 1001, bank["BOND"]))
+            order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+            order.add()
+            pending_orders.append(order)
 
 def main():
     global exchange
@@ -88,6 +113,10 @@ def main():
             parse(read(exchange))
             update_orders()
             update_bond_holdings()
+            print(bank)
+            for order in pending_orders:
+                print(order)
+            print("\n")
     except KeyboardInterrupt:
         exchange.close()
         print(bank)
