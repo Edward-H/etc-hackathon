@@ -25,6 +25,9 @@ class Order(object):
         self.price = price
         self.size = size
 
+    def __str__(self):
+        return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
+
     def add():
         b = ""
         if dir == True:
@@ -51,7 +54,7 @@ class Order(object):
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("10.0.1.245", 25000))
+    s.connect(("test-exch-carrot", 25001))
     return s.makefile('rw', 1)
 
 
@@ -88,6 +91,10 @@ def main():
             parse(read(exchange))
             update_orders()
             update_bond_holdings()
+            print(bank)
+            for order in pending_orders:
+                print(order)
+            print("\n")
     except KeyboardInterrupt:
         exchange.close()
         print(bank)
