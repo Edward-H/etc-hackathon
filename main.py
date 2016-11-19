@@ -39,6 +39,7 @@ class Order(object):
     def ack:
         if(dir==true) bank[stock]+=size
         else bank[stock]-=size
+
     def cancel:
         write(exchange, {"type": "cancel", "order_id": id})
         if(dir==true) bank[stock]-=size
