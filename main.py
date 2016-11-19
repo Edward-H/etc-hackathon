@@ -143,16 +143,11 @@ def trade_stock(stock):
         if(bank[stock] + pending_bank[stock] <= 90)
             order.add()
             unverified_orders.append(order)
-    else if (est<(sell+buy)/2)
+    else if(est<(sell+buy)/2)
         order = Order(trade_id, stock, False, (sell+buy)/2, 10)
         if(bank[stock]+pending_bank[stock]>=-90)
-            pending_orders.append(order)
-    else if (est < (sell + buy) / 2)
-        order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
-        if(bank[stock] + pending_bank[stock] >= -90)
-            order.add()
             unverified_orders.append(order)
-            pending_orders.append(order)
+
 
 
 def main():
