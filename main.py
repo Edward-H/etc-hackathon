@@ -38,7 +38,7 @@ class Order(object):
     size = 0
 
     def __init__(self, id, stock, dir, price, size):
-        self.id = id
+       self.id = id
         self.stock = stock
         self.dir = dir
         self.price = price
@@ -125,11 +125,11 @@ def update_bond_holdings():
     if pending_bank["BOND"] < 100 and bank["BOND"] < 100:
         order = Order(trade_id, "BOND", True, 999, 100 - pending_bank["BOND"])
         order.add()
-        pending_orders.append(order)
+        unverified_orders.append(order)
     elif pending_bank["BOND"] > 0 and bank["BOND"] > 0:
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
-        pending_orders.append(order)
+        unverified_orders.append(order)
 
 
 def trade_stock(stock):
