@@ -15,10 +15,10 @@ def add(id,stock,dir,price,size)
 def convert(id,stock,dir,size)
     if(dir==true) b="BUY"
     else b="SELL"
-    {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size}
+    write(exchange,{"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
 
 def cancel(id)
-    {"type": "cancel", "order_id": id}
+    write(exchange{"type": "cancel", "order_id": id})
 
 
 
