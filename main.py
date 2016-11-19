@@ -6,7 +6,6 @@ import socket
 import json
 import pdb
 
-from vale_valbz import *
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
