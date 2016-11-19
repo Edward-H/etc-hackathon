@@ -61,9 +61,13 @@ def update_bond_holdings():
 def main():
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
-    while True:
-        parse(read(exchange))
-        update_bond_holdings()
+    try:
+        while True:
+            parse(read(exchange))
+            update_bond_holdings()
+    except KeyboardInterrupt:
+        exchange.close()
+        print(bank)
 
 if __name__ == "__main__":
     main()
