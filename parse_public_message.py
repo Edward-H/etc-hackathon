@@ -26,17 +26,13 @@ def backfill_data():
     pass
 
 
-def parse(message):
+def public_parse(message):
     if message["type"] == "trade":
         price.loc[price.shape[0], message["symbol"]] = float(message["price"])
         volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
     elif message["type"] == "book":
         books[message["symbol"]] = {
             "buy": message["buy"], "sell": message["sell"]}
-    elif message["type"] == "fill":
-        for order in pending_orders:
-            if order.id == message["order_id"]:
-                order.fill(message["size"])
 
     backfill_data()
 
@@ -83,7 +79,7 @@ if __name__ == "__main__":
                    "symbol": "BOND",
                    "price": random.randint(1000, 100000),
                    "size": random.randint(100000, 500000)}
-        parse(message)
+        public_parse(message)
     print(get_latest_price())
     print(get_latest_volume())
     print(get_rolling_mean())

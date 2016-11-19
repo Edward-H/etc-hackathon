@@ -84,6 +84,12 @@ def write(exchange, obj):
 def read(exchange):
     return json.loads(exchange.readline())
 
+def private_parse(message):
+    if message["type"] == "fill":
+        for order in pending_orders:
+            if order.id == message["order_id"]:
+                order.fill(message["size"])
+
 def update_orders():
     for order in pending_orders:
         if order.size == 0:
@@ -97,11 +103,11 @@ def update_bond_holdings():
         trade_id += 1
         if bank["BOND"] == 0:
             order = Order(trade_id, "BOND", True, 1000, 100)
-            order.add()
+            order.add
             pending_orders.append(order)
         else:
             order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
-            order.add()
+            order.add
             pending_orders.append(order)
 
 def main():
@@ -110,7 +116,9 @@ def main():
     write(exchange, {"type": "hello", "team": "CARROT"})
     try:
         while True:
-            parse(read(exchange))
+            exchange_msg = read(exchange)
+            public_parse(exchange_msg)
+            private_parse(exchange_msg)
             update_orders()
             update_bond_holdings()
             print(bank)
