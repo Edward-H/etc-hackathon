@@ -4,17 +4,21 @@ from __future__ import print_function
 import sys
 import socket
 import json
+import pdb
 
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-pending_bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+pending_bank = {"BOND": 0, "VALBZ": 0, "VALE":
+                0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 unverified_orders = []
 trade_id = 0
 
+
 def get_historical_points(stock):
     last_20_price = price[stock].dropna().tail(20)
+
 
 def convert(id, stock, dir, size):
     if dir == True:
@@ -23,6 +27,7 @@ def convert(id, stock, dir, size):
         b = "SELL"
     write(exchange,
           {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
+
 
 class Order(object):
     id = 0
@@ -41,37 +46,37 @@ class Order(object):
     def __str__(self):
         return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
 
-    def add():
+    def add(self):
         b = ""
-        if dir == True:
+        if self.dir == True:
             b = "BUY"
-            pending_bank[stock] += size
+            pending_bank[self.stock] += self.size
         else:
             b = "SELL"
-            pending_bank[stock] -= size
-        write(exchange, {"type": "add", "order_id": id, "symbol":
-              stock, "dir": b, "price": price, "size": size})
+            pending_bank[self.stock] -= self.size
+        write(exchange, {"type": "add", "order_id": self.id, "symbol":
+              self.stock, "dir": b, "price": self.price, "size": self.size})
 
-    def cancel():
-        write(exchange, {"type": "cancel", "order_id": id})
-        if(dir==True):
-            bank[stock]-=size
+    def cancel(self):
+        write(exchange, {"type": "cancel", "order_id": self.id})
+        if(self.dir == True):
+            bank[self.stock] -= self.size
         else:
-            bank[stock]+=size
+            bank[self.stock] += self.size
 
-    def fill(fill_size):
-        size -= fill_size
-        if(dir == True):
-            bank[stock] += fill_size
+    def fill(self, fill_size):
+        self.size -= fill_size
+        if(self.dir == True):
+            bank[self.stock] += fill_size
         else:
-            bank[stock] -= fill_size
+            bank[self.stock] -= fill_size
 
-    def cancel():
-        write(exchange, {"type": "cancel", "order_id": id})
-        if(dir == True):
-            bank[stock] -= size
+    def cancel(self):
+        write(exchange, {"type": "cancel", "order_id": self.id})
+        if(self.dir == True):
+            bank[self.stock] -= self.size
         else:
-            bank[stock] += size
+            bank[self.stock] += self.size
 
 
 def connect():
@@ -87,6 +92,7 @@ def write(exchange, obj):
 
 def read(exchange):
     return json.loads(exchange.readline())
+
 
 def private_parse(message):
     if message["type"] == "fill":
@@ -104,25 +110,45 @@ def private_parse(message):
                 unverified_orders.remove(order)
                 
 
+
 def update_orders():
     for order in pending_orders:
         if order.size == 0:
             pending_orders.remove(order)
 
+
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
     # Update the book if no orders are pending
-    if not [x for x in pending_orders if x.stock == "BOND"]:
-        global trade_id
-        trade_id += 1
-        if pending_bank["BOND"] == 0:
-            order = Order(trade_id, "BOND", True, 1000, 100)
-            order.add
-            unverified_orders.append(order)
-        else:
-            order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
-            order.add
-            unverified_orders.append(order)
+    global trade_id
+    trade_id += 1
+    if pending_bank["BOND"] == 0:
+        order = Order(trade_id, "BOND", True, 1000, 100)
+        order.add()
+        pending_orders.append(order)
+    else:
+        order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+        order.add()
+        pending_orders.append(order)
+
+
+def trade_stock(stock):
+    est = get_estimate_price(stock)
+    (buy, sell) = get_books_msmb(stock)
+    global trade_id
+    trade_id += 1
+    if(est > (sell + buy) / 2)
+        order = Order(trade_id, stock, True, (sell + buy) / 2, 10)
+        if(bank[stock] + pending_bank[stock] <= 90)
+            order.add()
+            pending_orders.append(order)
+    else if (est < (sell + buy) / 2)
+        order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
+        if(bank[stock] + pending_bank[stock] >= -90)
+            order.add()
+            pending_orders.append(order)
+>>>>>>> 660fe8b63ac6ce5698dd59f2842ce973b158b2e1
+
 
 def main():
     global exchange
@@ -136,6 +162,7 @@ def main():
             update_orders()
             update_bond_holdings()
             print(bank)
+            print(pending_bank)
             for order in pending_orders:
                 print(order)
             print("\n")
