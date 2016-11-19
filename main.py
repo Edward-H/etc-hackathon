@@ -6,6 +6,7 @@ import socket
 import json
 import pdb
 
+from vale_valbz import *
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
@@ -149,6 +150,7 @@ def trade_stock(stock):
 
 def main():
     global exchange
+    global trade_id
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
     try:
@@ -158,6 +160,9 @@ def main():
             private_parse(exchange_msg)
             update_orders()
             update_bond_holdings()
+            trade_id+=1
+            trade_vale_valbz(trade_id)
+            trade_id+=3
             print(bank)
             print(pending_bank)
             for order in pending_orders:
