@@ -70,10 +70,16 @@ def get_latest_books():
 def get_books_mbms(symbol):
     max_buy = 0
     min_sell = 1e10
-    for quote in books[symbol]["buy"]:
-        max_buy = max(max_buy, quote[0])
-    for quote in books[symbol]["sell"]:
-        min_sell = min(min_sell, quote[0])
+    if len(books[symbol]["buy"]) == 0:
+        max_buy = None
+    else:
+        for quote in books[symbol]["buy"]:
+            max_buy = max(max_buy, quote[0])
+    if len(books[symbol]["sell"]) == 0:
+        min_sell = None
+    else:
+        for quote in books[symbol]["sell"]:
+            min_sell = min(min_sell, quote[0])
     return max_buy, min_sell
 
 def get_estimated_price(symbol, period=20):
