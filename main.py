@@ -63,9 +63,7 @@ def main():
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
     while True:
-        exchange_messages = read(exchange)
-        for msg in exchange_messages:
-            parse(msg)
+        parse(read(exchange))
         update_bond_holdings()
 
 if __name__ == "__main__":
