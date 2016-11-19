@@ -65,9 +65,18 @@ def get_latest_volume():
 def get_latest_books():
     return books
 
+def get_books_msmb(symbol):
+    max_buy = 0
+    min_sell = 1e10
+    for quote in books[symbol]["buy"]:
+        max_buy = max(max_buy, quote[0])
+    for quote in books[symbol]["sell"]:
+        min_sell = min(min_sell, quote[0])
+    return max_buy, min_sell
+
 def get_estimated_price(symbol, period=20):
     last_price = price[symbol].dropna().tail(20)
-    coeffs = np.polyfit(last_price.index, last_price.values, 8)
+    coeffs = np.polyfit(last_price.index, last_price.values, 3)
     return np.polyval(coeffs, price.shape[0])
 
 if __name__ == "__main__":
