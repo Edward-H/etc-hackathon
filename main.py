@@ -8,6 +8,7 @@ import json
 from parse_public_message import *
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+pending_bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 trade_id = 0
 
@@ -43,8 +44,10 @@ class Order(object):
         b = ""
         if dir == True:
             b = "BUY"
+            pending_bank[stock] += size
         else:
             b = "SELL"
+            pending_bank[stock] -= size
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
 
@@ -101,7 +104,7 @@ def update_bond_holdings():
     if not [x for x in pending_orders if x.stock == "BOND"]:
         global trade_id
         trade_id += 1
-        if bank["BOND"] == 0:
+        if pending_bank["BOND"] == 0:
             order = Order(trade_id, "BOND", True, 1000, 100)
             order.add
             pending_orders.append(order)
