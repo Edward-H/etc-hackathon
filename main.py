@@ -48,15 +48,12 @@ class Order(object):
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
 
-<<<<<<< HEAD
-    def ack():
-        if(dir==true) bank[stock]+=size
-        else bank[stock]-=size
-
     def cancel():
         write(exchange, {"type": "cancel", "order_id": id})
-        if(dir==true) bank[stock]-=size
-        else bank[stock]+=size
+        if(dir==True):
+            bank[stock]-=size
+        else:
+            bank[stock]+=size
 
     def fill(fill_size):
         size -= fill_size
@@ -99,9 +96,13 @@ def update_bond_holdings():
         global trade_id
         trade_id += 1
         if bank["BOND"] == 0:
-            pending_orders.append(Order(trade_id, "BOND", True, 1000, 100))
+            order = Order(trade_id, "BOND", True, 1000, 100)
+            order.add()
+            pending_orders.append(order)
         else:
-            pending_orders.append(Order(trade_id, "BOND", False, 1001, bank["BOND"]))
+            order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+            order.add()
+            pending_orders.append(order)
 
 def main():
     global exchange
