@@ -15,11 +15,8 @@ price.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 volume = pd.DataFrame(columns=symbols) # Trading Volume of transaction
 volume.loc[0] = [0, 0 ,0, 0, 0, 0, 0]
 books = {}
-
-def parse(message):
-    if message["type"] == "trade":
-        price.loc[price.shape[0], message["symbol"]] = float(message["price"])
-        volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
+for symbol in symbols:
+    books[symbol] = {"buy": [], "sell": []}
 
 def backfill_data():
     price.fillna(method="ffill", inplace=True)
@@ -27,15 +24,40 @@ def backfill_data():
     volume.fillna(method="ffill", inplace=True)
     volume.fillna(method="bfill", inplace=True)
 
+def parse(message):
+    if message["type"] == "trade":
+        price.loc[price.shape[0], message["symbol"]] = float(message["price"])
+        volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
+    elif message["type"] == "book":
+        books[message["symbol"]] = {"buy": message["buy"], "sell": message["sell"]}
+    backfill_data()
+
 def get_latest_price():
     backfill_data()
     latest_price = price.ix[price.shape[0]-1].to_dict()
     return latest_price
 
+def get_rolling_mean(period=20):
+    r_mean = price.rolling(period).mean()
+    return r_mean.loc[r_mean.shape[0]-1].to_dict()
+
+def get_rolling_std(period=20):
+    r_std = price.rolling(period).std()
+    return r_std.loc[r_std.shape[0]-1].to_dict()
+
+def get_sharpe_ratio(period=20): # Not actually sharpe's ratio
+    mean = price.rolling(period).mean()
+    stdev = price.rolling(period).std()
+    sharpe_ratio = mean / stdev
+    return sharpe_ratio.loc[sharpe_ratio.shape[0]-1].to_dict()
+
 def get_latest_volume():
     backfill_data()
     latest_vol = volume.loc[volume.shape[0]-1].to_dict()
     return latest_vol
+
+def get_latest_books():
+    return books
 
 if __name__ == "__main__":
     import random
@@ -47,3 +69,6 @@ if __name__ == "__main__":
         parse(message)
     print(get_latest_price())
     print(get_latest_volume())
+    print(get_rolling_mean())
+    print(get_rolling_std())
+    print(get_sharpe_ratio())
