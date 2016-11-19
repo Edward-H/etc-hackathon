@@ -27,9 +27,9 @@ def convert(id, stock, dir, size):
           {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
 
 
-<<<<<<< HEAD
+
 from parse_public_message import *
-=======
+
 def cancel(id):
     write(exchange, {"type": "cancel", "order_id": id})
 
