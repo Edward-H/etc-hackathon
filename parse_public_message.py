@@ -31,8 +31,20 @@ def parse(message):
         price.loc[price.shape[0], message["symbol"]] = float(message["price"])
         volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
     elif message["type"] == "book":
+<<<<<<< HEAD
         books[message["symbol"]] = {"buy": message["buy"], "sell": message["sell"]}
     backfill_data()
+=======
+        books[message["symbol"]] = {
+            "buy": message["buy"], "sell": message["sell"]}
+    elif message["type"] == "fill":
+        for order in pending_orders:
+            if order.id == message["order_id"]:
+                order.fill(message["size"])
+        
+    backfill_data()
+
+>>>>>>> 5d7a287690fb1f3e8fec626762e9b02af89596fa
 
 def get_latest_price():
     latest_price = price.ix[price.shape[0] - 1].to_dict()
