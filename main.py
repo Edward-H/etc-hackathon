@@ -12,7 +12,7 @@ bank = {"money": 0, "BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0
 id = 0
 
 def add(id, stock, dir, price, size):
-    if dir == true:
+    if dir == True:
         b = "BUY"
     else:
         b = "SELL"
@@ -21,7 +21,7 @@ def add(id, stock, dir, price, size):
 
 
 def convert(id, stock, dir, size):
-    if dir == true:
+    if dir == True:
         b = "BUY"
     else:
         b = "SELL"
@@ -53,16 +53,16 @@ def update_bond_holdings():
     if current_bond_price > 1000 and bank["BOND"] > 0:
         # Sell bonds (if we have any) if they are more than 1000.
         id += 1
-        add(id, "BOND", false, current_bond_price + 1, min(bank["BOND"], entry.size))
+        add(id, "BOND", False, current_bond_price + 1, min(bank["BOND"], entry.size))
     elif current_bond_price < 1000 and bank["BOND"] < 100:
         # Buy more bonds (if we can) if they are less than 1000.
         id += 1
-        add(id, "BOND", true, current_bond_price - 1, 100 - bank["BOND"])
+        add(id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
 
 def main():
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
-    while true:
+    while True:
         exchange_messages = read(exchange)
         for msg in exchange_messages:
             parse(msg)
