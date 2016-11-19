@@ -13,6 +13,7 @@ bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_bank = {"BOND": 0, "VALBZ": 0, "VALE":
                 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
+unverified_orders = []
 trade_id = 0
 
 
@@ -99,6 +100,16 @@ def private_parse(message):
         for order in pending_orders:
             if order.id == message["order_id"]:
                 order.fill(message["size"])
+    elif message["type"] == "reject":
+        for order in range(len(unverified_orders)):
+            if order.id == message["order_id"]:
+                unverified_orders.remove(order)
+    elif message["type"] == "ack":
+        for order in unverified_orders:
+            if order.id == message["order_id"]:
+                pending_orders.append(order)
+                unverified_orders.remove(order)
+                
 
 
 def update_orders():
@@ -141,6 +152,7 @@ def trade_stock(stock):
         if(bank[stock] + pending_bank[stock] >= -90)
             order.add()
             unverified_orders.append(order)
+            pending_orders.append(order)
 
 
 def main():
