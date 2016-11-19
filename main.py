@@ -5,12 +5,14 @@ import sys
 import socket
 import json
 
-<<<<<<< HEAD
+from parse_public_message import *
+
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-
-
+pending_orders = []
+trade_id = 0
 
 class Order(object):
+<<<<<<< HEAD
     id=0
     stock=""
     dir=true
@@ -27,16 +29,34 @@ class Order(object):
     def make_order(id,stock,dir,price,size):
         order = Order(id,stock,dir,price,size)
         return order
+=======
+    id = 0
+    stock = ""
+    dir = True
+    price = 0
+    size = 0
+
+    def __init__(self, id, stock, dir, price, size):
+        self.id = id
+        self.stock = stock
+        self.dir = dir
+        self.price = price
+        self.size = size
+
+    def __str__(self):
+        return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
+>>>>>>> origin/master
 
     def add():
         b = ""
-        if dir == true:
+        if dir == True:
             b = "BUY"
         else:
             b = "SELL"
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
 
+<<<<<<< HEAD
     def ack():
         if(dir==true) bank[stock]+=size
         else bank[stock]-=size
@@ -67,11 +87,26 @@ def convert(id, stock, dir, size):
 
 
 >>>>>>> origin/master
+=======
+    def fill(fill_size):
+        size -= fill_size
+        if(dir == True):
+            bank[stock] += fill_size
+        else:
+            bank[stock] -= fill_size
+
+    def cancel():
+        write(exchange, {"type": "cancel", "order_id": id})
+        if(dir == True):
+            bank[stock] -= size
+        else:
+            bank[stock] += size
+>>>>>>> origin/master
 
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("10.0.1.245", 25000))
+    s.connect(("test-exch-carrot", 25001))
     return s.makefile('rw', 1)
 
 
@@ -83,21 +118,21 @@ def write(exchange, obj):
 def read(exchange):
     return json.loads(exchange.readline())
 
+def update_orders():
+    for order in pending_orders:
+        if order.size == 0:
+            pending_orders.remove(order)
 
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
-    global trade_id
-    current_bond_price = get_latest_price()["BOND"]
-    if current_bond_price > 1000 and bank["BOND"] > 0:
-        # Sell bonds (if we have any) if they are more than 1000.
+    # Update the book if no orders are pending
+    if not [x for x in pending_orders if x.stock == "BOND"]:
+        global trade_id
         trade_id += 1
-        add(trade_id, "BOND", False, current_bond_price +
-            1, min(bank["BOND"], entry.size))
-    elif current_bond_price < 1000 and bank["BOND"] < 100:
-        # Buy more bonds (if we can) if they are less than 1000.
-        trade_id += 1
-        add(trade_id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
-
+        if bank["BOND"] == 0:
+            pending_orders.append(Order(trade_id, "BOND", True, 1000, 100))
+        else:
+            pending_orders.append(Order(trade_id, "BOND", False, 1001, bank["BOND"]))
 
 def main():
     global exchange
@@ -106,7 +141,12 @@ def main():
     try:
         while True:
             parse(read(exchange))
+            update_orders()
             update_bond_holdings()
+            print(bank)
+            for order in pending_orders:
+                print(order)
+            print("\n")
     except KeyboardInterrupt:
         exchange.close()
         print(bank)
