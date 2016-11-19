@@ -10,7 +10,9 @@ from parse_public_message import *
 import time
 
 bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-pending_bank = {"BOND": 0, "VALBZ": 0, "VALE":
+pending_bank_min = {"BOND": 0, "VALBZ": 0, "VALE":
+                0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+pending_bank_max = {"BOND": 0, "VALBZ": 0, "VALE":
                 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 unverified_orders = []
@@ -51,10 +53,10 @@ class Order(object):
         b = ""
         if self.dir == True:
             b = "BUY"
-            pending_bank[self.stock] += self.size
+            pending_bank_max[self.stock] += self.size
         else:
             b = "SELL"
-            pending_bank[self.stock] -= self.size
+            pending_bank_min[self.stock] -= self.size
         write(exchange, {"type": "add", "order_id": self.id, "symbol":
               self.stock, "dir": b, "price": self.price, "size": self.size})
 
@@ -62,22 +64,19 @@ class Order(object):
         write(exchange, {"type": "cancel", "order_id": self.id})
         if(self.dir == True):
             bank[self.stock] -= self.size
+            pending_bank_max -= self.size
         else:
             bank[self.stock] += self.size
+            pending_bank_min += self.size
 
     def fill(self, fill_size):
         self.size -= fill_size
         if(self.dir == True):
             bank[self.stock] += fill_size
+            pending_bank_min += fill_size
         else:
             bank[self.stock] -= fill_size
-
-    def cancel(self):
-        write(exchange, {"type": "cancel", "order_id": self.id})
-        if(self.dir == True):
-            bank[self.stock] -= self.size
-        else:
-            bank[self.stock] += self.size
+            pending_bank_max -= fill_size
 
 
 def connect():
@@ -101,10 +100,15 @@ def private_parse(message):
             if order.id == message["order_id"]:
                 order.fill(message["size"])
     elif message["type"] == "reject":
+        if message["error"] = "LIMIT:POSITION":
+            raise "Aargh!"
         for order in unverified_orders:
             if order.id == message["order_id"]:
                 unverified_orders.remove(order)
-                pending_bank[order.stock] -= order.size
+                if order.dir == True:
+                    pending_bank_max[order.stock] -= order.size
+                else
+                    pending_bank_min[order.stock] += order.size
     elif message["type"] == "ack":
         for order in unverified_orders:
             if order.id == message["order_id"]:
@@ -123,30 +127,30 @@ def update_bond_holdings():
     # Update the book if no orders are pending
     global trade_id
     trade_id += 1
-    if pending_bank["BOND"] < 100 and bank["BOND"] < 100:
+    if pending_bank_max["BOND"] < 100:
         order = Order(trade_id, "BOND", True, 999, 100 - pending_bank["BOND"])
         order.add()
         unverified_orders.append(order)
-    elif pending_bank["BOND"] > 0 and bank["BOND"] > 0:
+    elif pending_bank_min["BOND"] > 0:
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
         unverified_orders.append(order)
 
 
-def trade_stock(stock):
-    est = get_estimate_price(stock)
-    (buy, sell) = get_books_msmb(stock)
-    global trade_id
-    trade_id += 1
-    if(est > (sell + buy) / 2):
-        order = Order(trade_id, stock, True, (sell + buy) / 2, 10)
-        if(bank[stock] + pending_bank[stock] <= 90):
-            order.add()
-            unverified_orders.append(order)
-    elif(est < (sell + buy) / 2):
-        order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
-        if(bank[stock] + pending_bank[stock] >= -90):
-            unverified_orders.append(order)
+# def trade_stock(stock):
+#     est = get_estimate_price(stock)
+#     (buy, sell) = get_books_msmb(stock)
+#     global trade_id
+#     trade_id += 1
+#     if(est > (sell + buy) / 2):
+#         order = Order(trade_id, stock, True, (sell + buy) / 2, 10)
+#         if(bank[stock] + pending_bank[stock] <= 90):
+#             order.add()
+#             unverified_orders.append(order)
+#     elif(est < (sell + buy) / 2):
+#         order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
+#         if(bank[stock] + pending_bank[stock] >= -90):
+#             unverified_orders.append(order)
 
 
 def trade_vale_valbz(id):
@@ -181,13 +185,14 @@ def main():
             public_parse(exchange_msg)
             private_parse(exchange_msg)
             update_orders()
-            update_bond_holdings()
-            trade_id += 1
+            # update_bond_holdings()
+            # trade_id += 1
             trade_vale_valbz(trade_id)
             trade_id += 3
             print(exchange_msg)
             print(bank)
-            print(pending_bank)
+            print(pending_bank_min)
+            print(pending_bank_max)
             for order in pending_orders:
                 print(order)
             print("\n")
