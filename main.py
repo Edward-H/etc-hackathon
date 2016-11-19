@@ -25,11 +25,6 @@ class Order(object):
         self.price = price
         self.size = size
 
-    def make_order(id, stock, dir, price, size):
-        @staticmethod
-        order = Order(id, stock, dir, price, size)
-        return order
-
     def add():
         b = ""
         if dir == True:
@@ -80,9 +75,9 @@ def update_bond_holdings():
         global trade_id
         trade_id += 1
         if bank["BOND"] == 0:
-            pending_orders.append(Order.make_order(trade_id, "BOND", True, 1000, 100))
+            pending_orders.append(Order(trade_id, "BOND", True, 1000, 100))
         else:
-            pending_orders.append(Order.make_order(trade_id, "BOND", False, 1001, bank["BOND"]))
+            pending_orders.append(Order(trade_id, "BOND", False, 1001, bank["BOND"]))
 
 def main():
     global exchange
