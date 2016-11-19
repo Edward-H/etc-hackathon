@@ -120,6 +120,22 @@ def update_bond_holdings():
             order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
             order.add
             pending_orders.append(order)
+==========
+def trade_stock(stock):
+    est = get_estimate_price(stock)
+    (buy,sell)=get_books_msmb(stock)
+    global trade_id
+    trade_id+=1
+    if(est>(sell+buy)/2)
+        order = Order(trade_id, stock, True, (sell+buy)/2, 10)
+        if(bank[stock]+pending_bank[stock]<=90)
+            order.add()
+            pending_orders.append(order)
+    else if (est<(sell+buy)/2)
+        order = Order(trade_id, stock, False, (sell+buy)/2, 10)
+        if(bank[stock]+pending_bank[stock]>=-90)
+            order.add()
+            pending_orders.append(order)
 
 
 def main():
