@@ -92,7 +92,7 @@ def get_multi_books_mbms(symbol, limit=None):
         for i in range(len(quote[1])):
             min_sell.append(quote[0])
     max_buy.sort(reverse=True)
-    min_sell.sort(reverse=True)
+    min_sell.sort()
     max_buy = max_buy[0:limit]
     min_sell = min_sell[0:limit]
     return max_buy, min_sell
