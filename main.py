@@ -11,25 +11,18 @@ bank = {"BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 pending_orders = []
 trade_id = 0
 
+def get_historical_points(stock):
+    last_20_price = price[stock].dropna().tail(20)
+
+def convert(id, stock, dir, size):
+    if dir == True:
+        b = "BUY"
+    else:
+        b = "SELL"
+    write(exchange,
+          {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
+
 class Order(object):
-<<<<<<< HEAD
-    id=0
-    stock=""
-    dir=true
-    price=0
-    size=0
-    
-    def __init__(self,id,stock,dir,price,size):
-        self.id=id
-        self.stock=stock
-        self.dir=dir
-        self.price=price
-        self.size=size
-        
-    def make_order(id,stock,dir,price,size):
-        order = Order(id,stock,dir,price,size)
-        return order
-=======
     id = 0
     stock = ""
     dir = True
@@ -45,7 +38,6 @@ class Order(object):
 
     def __str__(self):
         return "<{0}, {1}, {2}, {3}, {4}>".format(self.id, self.stock, self.dir, self.price, self.size)
->>>>>>> origin/master
 
     def add():
         b = ""
@@ -65,29 +57,7 @@ class Order(object):
         write(exchange, {"type": "cancel", "order_id": id})
         if(dir==true) bank[stock]-=size
         else bank[stock]+=size
-=======
-from parse_public_message import *
 
-bank = {"money": 0, "BOND": 0, "VALBZ": 0,
-        "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
-trade_id = 0
-
-
-
-def get_historical_points(stock):
-    last_20_price = price[stock].dropna().tail(20)
-
-def convert(id, stock, dir, size):
-    if dir == True:
-        b = "BUY"
-    else:
-        b = "SELL"
-    write(exchange,
-          {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
-
-
->>>>>>> origin/master
-=======
     def fill(fill_size):
         size -= fill_size
         if(dir == True):
@@ -101,7 +71,6 @@ def convert(id, stock, dir, size):
             bank[stock] -= size
         else:
             bank[stock] += size
->>>>>>> origin/master
 
 
 def connect():
