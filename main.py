@@ -194,6 +194,7 @@ def main():
             for order in pending_orders:
                 print(order)
             print("\n")
+            time.sleep(0.05)
     except KeyboardInterrupt:
         exchange.close()
         print(bank)
