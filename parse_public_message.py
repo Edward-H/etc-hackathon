@@ -19,10 +19,11 @@ for symbol in symbols:
     books[symbol] = {"buy": [], "sell": []}
 
 def backfill_data():
-    price.fillna(method="ffill", inplace=True)
-    price.fillna(method="bfill", inplace=True)
-    volume.fillna(method="ffill", inplace=True)
-    volume.fillna(method="bfill", inplace=True)
+#    price.fillna(method="ffill", inplace=True)
+#    price.fillna(method="bfill", inplace=True)
+#    volume.fillna(method="ffill", inplace=True)
+#    volume.fillna(method="bfill", inplace=True)
+    pass
 
 def parse(message):
     if message["type"] == "trade":
@@ -30,7 +31,7 @@ def parse(message):
         volume.loc[price.shape[0], message["symbol"]] = float(message["size"])
     elif message["type"] == "book":
         books[message["symbol"]] = {"buy": message["buy"], "sell": message["sell"]}
-    backfill_data()
+    #backfill_data()
 
 def get_latest_price():
     backfill_data()

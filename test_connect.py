@@ -24,12 +24,17 @@ def main():
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 
 if __name__ == "__main__":
-    from parse_public_message import *
-    exchange = connect()
-    iteration = 0
-    write(exchange, {"type": "hello", "team": "Carrot"})
-    while iteration < 100:
-        message = read(exchange)
-        parse(message)
+    try:
+        from parse_public_message import *
+        exchange = connect()
+        
+        write(exchange, {"type": "hello", "team": "CARROT"})
+        while price.shape[0] < 50:
+            message = read(exchange)
+            parse(message)
+            print(get_latest_price())
+        
         print(price)
-        iteration += 1
+        exchange.close()
+    except KeyboardInterrupt:
+        exchange.close()
