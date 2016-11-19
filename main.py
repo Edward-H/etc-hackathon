@@ -163,6 +163,7 @@ def main():
             trade_id+=1
             trade_vale_valbz(trade_id)
             trade_id+=3
+            print(exchange_msg)
             print(bank)
             print(pending_bank)
             for order in pending_orders:
