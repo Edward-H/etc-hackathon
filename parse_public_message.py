@@ -67,7 +67,7 @@ def get_latest_volume():
 def get_latest_books():
     return books
 
-def get_books_msmb(symbol):
+def get_books_mbms(symbol):
     max_buy = 0
     min_sell = 1e10
     for quote in books[symbol]["buy"]:
