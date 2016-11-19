@@ -5,6 +5,8 @@ import sys
 import socket
 import json
 
+from parse_public_message import *
+
 bank = {"money": 0, "BOND": 0, "VALBZ": 0, "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
 
 
@@ -28,7 +30,6 @@ def convert(id, stock, dir, size):
 
 
 
-from parse_public_message import *
 
 def cancel(id):
     write(exchange, {"type": "cancel", "order_id": id})
