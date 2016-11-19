@@ -28,7 +28,7 @@ class Order(object):
         order = Order(id,stock,dir,price,size)
         return order
 
-    def add:
+    def add():
         b = ""
         if dir == true:
             b = "BUY"
@@ -37,11 +37,11 @@ class Order(object):
         write(exchange, {"type": "add", "order_id": id, "symbol":
               stock, "dir": b, "price": price, "size": size})
 
-    def ack:
+    def ack():
         if(dir==true) bank[stock]+=size
         else bank[stock]-=size
 
-    def cancel:
+    def cancel():
         write(exchange, {"type": "cancel", "order_id": id})
         if(dir==true) bank[stock]-=size
         else bank[stock]+=size
@@ -53,14 +53,9 @@ bank = {"money": 0, "BOND": 0, "VALBZ": 0,
 trade_id = 0
 
 
-def add(id, stock, dir, price, size):
-    if dir == True:
-        b = "BUY"
-    else:
-        b = "SELL"
-    write(exchange, {"type": "add", "order_id": id, "symbol":
-          stock, "dir": b, "price": price, "size": size})
 
+def get_historical_points(stock):
+    last_20_price = price[stock].dropna().tail(20)
 
 def convert(id, stock, dir, size):
     if dir == True:
@@ -71,8 +66,6 @@ def convert(id, stock, dir, size):
           {"type": "convert", "order_id": id, "symbol": stock, "dir": b, "size": size})
 
 
-def cancel(id):
-    write(exchange, {"type": "cancel", "order_id": id})
 >>>>>>> origin/master
 
 
