@@ -122,10 +122,10 @@ def update_bond_holdings():
     global trade_id
     trade_id += 1
     if pending_bank["BOND"] < 100 and bank["BOND"] < 100:
-        order = Order(trade_id, "BOND", True, 999, 100)
+        order = Order(trade_id, "BOND", True, 999, 100 - pending_bank["BOND"])
         order.add()
         pending_orders.append(order)
-    elif pending_bank["BOND"] > 0 and bank["BOND"] > 0 :
+    elif pending_bank["BOND"] > 0 and bank["BOND"] > 0:
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
         pending_orders.append(order)
@@ -158,6 +158,7 @@ def main():
             private_parse(exchange_msg)
             update_orders()
             update_bond_holdings()
+            print(exchange_msg)
             print(bank)
             print(pending_bank)
             for order in pending_orders:
