@@ -101,7 +101,7 @@ def private_parse(message):
             if order.id == message["order_id"]:
                 order.fill(message["size"])
     elif message["type"] == "reject":
-        for order in range(len(unverified_orders)):
+        for order in unverified_orders:
             if order.id == message["order_id"]:
                 unverified_orders.remove(order)
     elif message["type"] == "ack":
