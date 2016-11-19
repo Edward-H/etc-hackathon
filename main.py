@@ -121,11 +121,11 @@ def update_bond_holdings():
     # Update the book if no orders are pending
     global trade_id
     trade_id += 1
-    if pending_bank["BOND"] != 100 and bank["BOND"] != 100:
+    if pending_bank["BOND"] < 100 and bank["BOND"] < 100:
         order = Order(trade_id, "BOND", True, 1000, 100)
         order.add()
         pending_orders.append(order)
-    else:
+    else if bank["BOND"] > 0:
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
         pending_orders.append(order)
