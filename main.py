@@ -9,6 +9,7 @@ from parse_public_message import *
 
 bank = {"money": 0, "BOND": 0, "VALBZ": 0,
         "VALE": 0, "GS": 0, "MS": 0, "WFC": 0, "XLF": 0}
+trade_id = 0
 
 
 def add(id, stock, dir, price, size):
@@ -35,7 +36,7 @@ def cancel(id):
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("test-exch-carrot", 25000))
+    s.connect(("10.0.1.245", 25000))
     return s.makefile('rw', 1)
 
 
@@ -50,19 +51,21 @@ def read(exchange):
 
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
+    global trade_id
     current_bond_price = get_latest_price()["BOND"]
     if current_bond_price > 1000 and bank["BOND"] > 0:
         # Sell bonds (if we have any) if they are more than 1000.
-        id += 1
-        add(id, "BOND", False, current_bond_price +
+        trade_id += 1
+        add(trade_id, "BOND", False, current_bond_price +
             1, min(bank["BOND"], entry.size))
     elif current_bond_price < 1000 and bank["BOND"] < 100:
         # Buy more bonds (if we can) if they are less than 1000.
-        id += 1
-        add(id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
+        trade_id += 1
+        add(trade_id, "BOND", True, current_bond_price - 1, 100 - bank["BOND"])
 
 
 def main():
+    global exchange
     exchange = connect()
     write(exchange, {"type": "hello", "team": "CARROT"})
     while True:

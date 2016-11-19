@@ -53,9 +53,10 @@ def get_rolling_std(period=20):
 
 
 def get_sharpe_ratio(period=20):  # Not actually sharpe's ratio
-    mean = price.rolling(period).mean()
+    cum_returns = (price.loc[price.shape[0] - 1] / price.loc[
+                   max(0, price.shape[0] - period - 1)]) - 1
     stdev = price.rolling(period).std()
-    sharpe_ratio = mean / stdev
+    sharpe_ratio = cum_returns / stdev
     return sharpe_ratio.loc[sharpe_ratio.shape[0] - 1].to_dict()
 
 
