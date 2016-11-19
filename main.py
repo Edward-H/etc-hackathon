@@ -103,6 +103,7 @@ def private_parse(message):
         for order in unverified_orders:
             if order.id == message["order_id"]:
                 unverified_orders.remove(order)
+                pending_bank[order.stock] -= size
     elif message["type"] == "ack":
         for order in unverified_orders:
             if order.id == message["order_id"]:
