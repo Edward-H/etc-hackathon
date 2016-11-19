@@ -5,6 +5,7 @@ import sys
 import socket
 import json
 import pdb
+import time
 
 from parse_public_message import *
 import time
@@ -73,15 +74,21 @@ class Order(object):
         self.size -= fill_size
         if(self.dir == True):
             bank[self.stock] += fill_size
-            pending_bank_min += fill_size
+            pending_bank_min[self.stock] += fill_size
         else:
             bank[self.stock] -= fill_size
-            pending_bank_max -= fill_size
+            pending_bank_max[self.stock] -= fill_size
 
+    def cancel(self):
+        write(exchange, {"type": "cancel", "order_id": self.id})
+        if(self.dir == True):
+            bank[self.stock] -= self.size
+        else:
+            bank[self.stock] += self.size
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("test-exch-carrot", 25001))
+    s.connect(("production", 25000))
     return s.makefile('rw', 1)
 
 
@@ -102,6 +109,15 @@ def private_parse(message):
     elif message["type"] == "reject":
         for order in unverified_orders:
             if order.id == message["order_id"]:
+                if message["error"] == "LIMIT:POSITION":
+                    print("----------------------------")
+                    print(pending_orders)
+                    print(unverified_orders)
+                    print(pending_bank_max)
+                    print(pending_bank_min)
+                    print(order)
+                    raise "Argh!"
+
                 unverified_orders.remove(order)
                 if order.dir == True:
                     pending_bank_max[order.stock] -= order.size
@@ -126,14 +142,13 @@ def update_bond_holdings():
     global trade_id
     trade_id += 1
     if pending_bank_max["BOND"] < 100:
-        order = Order(trade_id, "BOND", True, 999, 100 - pending_bank["BOND"])
+        order = Order(trade_id, "BOND", True, 999, 100 - pending_bank_max["BOND"])
         order.add()
         unverified_orders.append(order)
     elif pending_bank_min["BOND"] > 0:
         order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
         order.add()
         unverified_orders.append(order)
-
 
 # def trade_stock(stock):
 #     est = get_estimate_price(stock)
@@ -173,6 +188,7 @@ def trade_vale_valbz(id):
 
 
 def main():
+
     global exchange
     global trade_id
     exchange = connect()
@@ -183,14 +199,13 @@ def main():
             public_parse(exchange_msg)
             private_parse(exchange_msg)
             update_orders()
-            # update_bond_holdings()
-            # trade_id += 1
+            update_bond_holdings()
+            trade_id += 1
             trade_vale_valbz(trade_id)
-            trade_id += 3
             print(exchange_msg)
             print(bank)
-            print(pending_bank_min)
             print(pending_bank_max)
+            print(pending_bank_min)
             for order in pending_orders:
                 print(order)
             print("\n")
