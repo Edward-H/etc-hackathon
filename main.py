@@ -108,7 +108,6 @@ def private_parse(message):
             if order.id == message["order_id"]:
                 pending_orders.append(order)
                 unverified_orders.remove(order)
-                
 
 
 def update_orders():
@@ -137,16 +136,15 @@ def trade_stock(stock):
     (buy, sell) = get_books_msmb(stock)
     global trade_id
     trade_id += 1
-    if(est > (sell + buy) / 2)
+    if(est > (sell + buy) / 2):
         order = Order(trade_id, stock, True, (sell + buy) / 2, 10)
-        if(bank[stock] + pending_bank[stock] <= 90)
+        if(bank[stock] + pending_bank[stock] <= 90):
             order.add()
             unverified_orders.append(order)
-    else if(est<(sell+buy)/2)
-        order = Order(trade_id, stock, False, (sell+buy)/2, 10)
-        if(bank[stock]+pending_bank[stock]>=-90)
+    elif(est < (sell + buy) / 2):
+        order = Order(trade_id, stock, False, (sell + buy) / 2, 10)
+        if(bank[stock] + pending_bank[stock] >= -90):
             unverified_orders.append(order)
-
 
 
 def main():
