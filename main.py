@@ -19,6 +19,8 @@ pending_orders = []
 unverified_orders = []
 trade_id = 0
 
+stop_timer = 20
+
 
 def get_historical_points(stock):
     last_20_price = price[stock].dropna().tail(20)
@@ -116,7 +118,7 @@ def private_parse(message):
                     print(pending_bank_max)
                     print(pending_bank_min)
                     print(order)
-                    raise "Argh!"
+                    stop_timer = 20
 
                 unverified_orders.remove(order)
                 if order.dir == True:
@@ -139,16 +141,18 @@ def update_orders():
 def update_bond_holdings():
     # TO-DO: Cancel orders when impossible/better options exist.
     # Update the book if no orders are pending
-    global trade_id
+    global trade_id, stop_timer
     trade_id += 1
-    if pending_bank_max["BOND"] < 100:
-        order = Order(trade_id, "BOND", True, 999, 100 - pending_bank_max["BOND"])
+    if stop_timer <= 0:
+        order = Order(trade_id, "BOND", True, 999, 10)
         order.add()
         unverified_orders.append(order)
-    elif pending_bank_min["BOND"] > 0:
-        order = Order(trade_id, "BOND", False, 1001, bank["BOND"])
+        order = Order(trade_id, "BOND", False, 1001, 10)
         order.add()
         unverified_orders.append(order)
+    if stop_timer > 0:
+        stop_timer -= 1
+
 
 # def trade_stock(stock):
 #     est = get_estimate_price(stock)
